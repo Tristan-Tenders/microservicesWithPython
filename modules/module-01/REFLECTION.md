@@ -22,7 +22,7 @@ You started from a painful monolith. Now you're splitting it into separate servi
 
 Think about it from three angles: the developer who has to change code, the team that has to deploy it, and the user who has to live with its failures. You don't need to cover all three, pick the one that felt most real to you today.
 
-> _Your answer:_
+> _Your answer:_ I feel like I was the one that has to live with the failures with the way we had to disect the code and stuff it made me feel like I was looking for the issue in the code that caused an outage or something 
 
 ---
 
@@ -34,7 +34,7 @@ Look at your service map. Every arrow between two services is a decision someone
 
 What would break, slow down, or become harder to manage if you merged those two services back together?
 
-> _Your answer:_
+> _Your answer:_ put activity and logging as seperate services because they are for different problems. If we merged them then since the activity isnt a long term data thing like we dont keep it for as long as logs it would take more storage.
 
 ---
 
@@ -46,7 +46,7 @@ Microservices solve the monolith's problems. But they create new ones.
 
 No need to solve it: just name it honestly. This is exactly the tension the rest of the course is about.
 
-> _Your answer:_
+> _Your answer:_ In the MONOLITH one problem was deleteing a user because u need to cascade but here we go per service to delete but the ones in activity still are there so we kinda trade consistency for complexity
 
 ---
 
