@@ -18,7 +18,7 @@ You built a service with distinct layers: models, schemas, repository, service, 
 
 Think about what happens six months later when someone new joins the team, or when you need to swap SQLite for PostgreSQL. What does the layered structure protect you from?
 
-> *Your answer:*
+ Layers matter when something has to change. Swapping SQLite for Postgres is a `database.py` edit, not a grep across every route. And a new dev knows where to look instead of reading one giant file.
 
 ---
 
@@ -30,7 +30,7 @@ Each service owns its data exclusively — no other service is allowed to touch 
 
 Give a concrete scenario, not a general principle.
 
-> *Your answer:*
+ If notification-service wrote directly to my `games` table, it skips `GameCreate` validation, so junk rows show up that `GameOut` can't even serialize. Then I add a column next sprint and their old inserts break in prod. Coupled at the worst level: the table.
 
 ---
 
@@ -42,7 +42,7 @@ You now have models, schemas, a repository, a service, and routes — five layer
 
 And at what point does the complexity start to pay off? Where is the tipping point?
 
-> *Your answer:*
+ The more files, more imports, more tests pasy off when a second dev shows up. The alternative is a 600-line file you can't find anything in.
 
 ---
 
