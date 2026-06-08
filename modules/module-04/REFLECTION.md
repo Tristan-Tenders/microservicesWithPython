@@ -1,7 +1,7 @@
 # Module 4 — Reflection
 
-**Team name**: _______________
-**Branch**: `module-04/<team-name>`
+**Team name**: Tristan
+**Branch**: `module-04/Tristan`
 **Submitted**: before Module 5 lesson
 
 ---
@@ -18,7 +18,7 @@ In Module 3, services called each other directly over HTTP. Now activity-service
 
 Think about what happens under load, or when notification-service is temporarily down.
 
-> *Your answer:*
+> activity-service doesn't wait on notification-service. The activity saves, the request returns, done. If notification-service is slow or down, the message just waits in the queue until it recovers.
 
 ---
 
@@ -30,7 +30,7 @@ In Module 3 you already knew how to call another service directly over HTTP — 
 
 Think about what happens if notification-service is slow, or crashes mid-message.
 
-> *Your answer:*
+> For user validation we need the answer before we can continue — can't log an activity for a nonexistent user. Notifications are different, nobody's waiting on them. If we called notification-service over HTTP and it crashed, the message is gone. The queue keeps it.
 
 ---
 
@@ -42,7 +42,7 @@ With synchronous REST, you get an immediate answer: success or failure. With asy
 
 What visibility do you lose when you go async?
 
-> *Your answer:*
+> Users won't notice — they never see notification delivery status anyway. As a dev you lose the immediate feedback. An HTTP call throws on failure. A queued message that never gets consumed just sits there unless you're watching the queue or logging on the consumer side.
 
 ---
 
