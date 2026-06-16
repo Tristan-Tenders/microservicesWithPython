@@ -1,0 +1,6 @@
+# Module 6: Adds auth-service for JWT authentication.
+# No new infrastructure required — auth-service runs locally with uvicorn.
+#
+# Start with:
+#   uvicorn app.main:app --port 8005
+version: "3.9"

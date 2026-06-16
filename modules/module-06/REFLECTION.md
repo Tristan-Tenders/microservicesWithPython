@@ -18,7 +18,7 @@ The auth-service issues JWT tokens that game-service validates locally — game-
 
 Think about what a signature actually proves, and what the shared secret key does.
 
-> JWTs are self-contained. The auth-service signs the token with a secret key, and game-service has the same key, so it can verify the signature locally without asking anyone. If the signature checks out, the token is genuine — nobody tampered with it. The only thing a central auth check would add is the ability to revoke tokens before they expire, which we're not doing here. For most use cases, local verification is fast enough and removes a network call on every protected request.
+> The token is signed with a secret key, and game-service has the same key. That's it. If the signature is valid, the token came from auth-service and nobody touched it in transit. Game-service doesn't need to phone home to confirm any of that — it can do the math locally. The only thing you lose by not calling auth-service is the ability to revoke a token mid-life, but for most read/write APIs that's an acceptable tradeoff for not adding a network hop to every single protected request.
 
 ---
 
@@ -28,7 +28,7 @@ The `require_admin` dependency in game-service checks `role == "admin"` inside t
 
 **What does this trust model assume about the token?** And what happens if the secret key leaks?
 
-> It assumes the token was issued by a service that actually verified the user's identity and assigned them the right role. The role claim in the payload is just a string — game-service trusts it because the signature proves auth-service put it there. If the secret key leaks, that whole trust model collapses. Anyone with the key can mint a token with `"role": "admin"` and delete every game in the system. The key is the only thing standing between the system and a full privilege escalation.
+> It assumes auth-service actually checked who the user is before handing out the token. The role claim is just a string in a JSON blob — game-service only trusts it because the signature proves auth-service wrote it. If the secret key leaks, none of that holds anymore. Anyone who has the key can sign their own token with whatever role they want. There's no second check, no database lookup, nothing. One leaked key and the whole authorization layer is gone.
 
 ---
 
@@ -40,7 +40,7 @@ JWTs can't be invalidated before they expire. If an admin account is compromised
 
 Is there a scenario where short expiry times alone are enough?
 
-> The main options are: short expiry (tokens die fast, so the damage window is small), a token blocklist (you store revoked token IDs server-side, which adds a database lookup on every request and partially defeats the point of stateless auth), or rotating refresh tokens (short-lived access tokens paired with longer-lived refresh tokens that can be revoked). Short expiry alone is enough when the risk is low and the UX cost of re-authenticating frequently is acceptable — internal tooling, for example. For anything where a compromised admin account could cause serious damage, you need a blocklist or refresh token rotation so you can actually cut off access when you notice the breach.
+> Short expiry is the simplest fix — if tokens only live 5 minutes, the window for damage is small. The problem is it makes users log in constantly. A token blocklist lets you revoke specific tokens immediately, but now you're doing a database lookup on every request, which is basically adding back the thing stateless auth was supposed to avoid. Refresh tokens split the difference: short-lived access tokens do the actual work, and a longer-lived refresh token can be revoked when you need to cut someone off. Short expiry alone is probably fine for internal tools where the users are trusted and re-auth isn't a big deal. For anything where a compromised admin account could delete data or expose users, you need actual revocation.
 
 ---
 
