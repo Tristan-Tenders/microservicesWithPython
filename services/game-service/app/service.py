@@ -32,6 +32,12 @@ def get_game_by_id(db: Session, game_id: str) -> GameOut:
     return GameOut.model_validate(record)
 
 
+def remove_game(db: Session, game_id: str) -> None:
+    deleted = repository.delete_game(db, game_id)
+    if not deleted:
+        raise ValueError(f"Game {game_id} not found")
+
+
 def register_game(db: Session, data: GameCreate) -> GameOut:
     record = repository.insert_game(db, data)
     set_game_summary(record.id, {

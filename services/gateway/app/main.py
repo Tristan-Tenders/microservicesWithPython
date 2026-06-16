@@ -14,6 +14,8 @@ ROUTES: dict[str, str] = {
     # Added in Module 5
     "consent": settings.logging_service_url,
     "logs":    settings.logging_service_url,
+    # Added in Module 6
+    "auth":    settings.auth_service_url,
 }
 
 

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app import schemas, service
 from app.database import get_db
+from app.security import require_admin
 
 router = APIRouter(prefix="/v1/games", tags=["games"])
 
@@ -35,5 +36,13 @@ def get_summary(game_id: str):
 def get_one(game_id: str, db: Session = Depends(get_db)):
     try:
         return service.get_game_by_id(db, game_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.delete("/{game_id}", status_code=204, dependencies=[Depends(require_admin)])
+def delete_one(game_id: str, db: Session = Depends(get_db)):
+    try:
+        service.remove_game(db, game_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

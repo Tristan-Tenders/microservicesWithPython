@@ -23,6 +23,15 @@ def find_game(db: Session, game_id: str) -> Game | None:
     return db.query(Game).filter(Game.id == game_id).first()
 
 
+def delete_game(db: Session, game_id: str) -> bool:
+    record = db.query(Game).filter(Game.id == game_id).first()
+    if record is None:
+        return False
+    db.delete(record)
+    db.commit()
+    return True
+
+
 def insert_game(db: Session, data: GameCreate) -> Game:
     record = Game(
         title=data.title,
