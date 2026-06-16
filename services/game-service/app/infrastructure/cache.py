@@ -44,8 +44,11 @@ def set_game_summary(game_id: str, data: dict) -> None:
         from app.infrastructure.cache import set_game_summary
         set_game_summary(game.id, {"id": game.id, "title": game.title, ...})
     """
-    r = _get_client()
-    r.set(_key(game_id), json.dumps(data))
+    try:
+        r = _get_client()
+        r.set(_key(game_id), json.dumps(data))
+    except Exception:
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -70,4 +73,11 @@ def get_game_summary(game_id: str) -> dict | None:
         → call get_game_summary(game_id)
         → return 200 with the dict, or 404 if None
     """
-    raise NotImplementedError
+    try:
+        r = _get_client()
+        raw = r.get(_key(game_id))
+        if raw is None:
+            return None
+        return json.loads(raw)
+    except Exception:
+        return None
