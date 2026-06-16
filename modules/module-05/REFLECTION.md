@@ -1,7 +1,7 @@
 # Module 5 — Reflection
 
 **Team name**: _______________
-**Branch**: `module-05/<team-name>`
+**Branch**: `module-05/<tristan>`
 **Submitted**: before Module 6 lesson
 
 ---
@@ -18,7 +18,7 @@ The game-service now has two models for the same data: SQLite for writes, Redis 
 
 Think about what kind of queries each model is optimised for, and what would happen if you tried to use the write model for high-traffic read operations.
 
-> *Your answer:*
+> SQLite is built for writes — constraints, consistency, safe concurrent access. Redis is built for reads — you give it a key and it gives you a value, no scanning, no joins. If you try to run heavy read traffic through SQLite when things get busy, you get lock contention and slow queries. Two representations is more overhead, but you're letting each tool do the one thing it's actually fast at instead of asking one of them to do both.
 
 ---
 
@@ -30,7 +30,7 @@ The logging-service checks GDPR consent before recording any activity. If a user
 
 From a system design perspective: where is the right place to enforce this rule — in the logging-service, in the activity-service, or at the gateway? Why?
 
-> *Your answer:*
+> You have to accept that your data will always have gaps. Anything that happened before a user opted in is just gone — not delayed, not backfillable, gone. That's the design. As for where the check belongs: the logging-service. It owns both the consent records and the activity logs, so it's the only one with enough context to make that call. Putting the check in the gateway means the gateway now has to understand what logging is, which it shouldn't. Putting it in the activity-service means activity tracking suddenly has to care about GDPR consent, which are two separate concerns that have no business being tangled together.
 
 ---
 
@@ -42,7 +42,7 @@ With CQRS, your write model and read model can drift out of sync — a game is u
 
 Is there a class of applications where eventual consistency is never acceptable? What are they?
 
-> *Your answer:*
+> It matters when the user is the one who made the change. You update a game's title, hit the summary endpoint immediately, and see the old name — that feels broken even though the write worked fine. The closer the action and the read are in time, the more the inconsistency sticks out. It's totally fine for something like a trending games list, where nobody expects the numbers to update in real time anyway. Financial systems are where this gets genuinely dangerous — if your bank balance is a few seconds stale while you're making a payment, that's not a minor UX annoyance, that's a correctness problem. Same with anything that controls whether a purchase goes through or whether a medical decision gets made on current data.
 
 ---
 

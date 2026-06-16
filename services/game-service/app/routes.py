@@ -22,6 +22,15 @@ def get_all(limit: int = 20, offset: int = 0, db: Session = Depends(get_db)):
     return service.list_all_games(db, limit=limit, offset=offset)
 
 
+@router.get("/{game_id}/summary")
+def get_summary(game_id: str):
+    from app.infrastructure.cache import get_game_summary
+    summary = get_game_summary(game_id)
+    if summary is None:
+        raise HTTPException(status_code=404, detail="Not in cache")
+    return summary
+
+
 @router.get("/{game_id}", response_model=schemas.GameOut)
 def get_one(game_id: str, db: Session = Depends(get_db)):
     try:

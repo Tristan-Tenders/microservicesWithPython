@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app import repository
+from app.infrastructure.cache import set_game_summary
 from app.schemas import GameCreate, GameList, GameOut
 
 
@@ -33,4 +34,10 @@ def get_game_by_id(db: Session, game_id: str) -> GameOut:
 
 def register_game(db: Session, data: GameCreate) -> GameOut:
     record = repository.insert_game(db, data)
+    set_game_summary(record.id, {
+        "id": record.id,
+        "title": record.title,
+        "genre": record.genre,
+        "platform": record.platform,
+    })
     return GameOut.model_validate(record)
